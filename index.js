@@ -12,16 +12,32 @@ app.use(cors({optionsSuccessStatus: 200}));  // some legacy browsers choke on 20
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
+app.use(express.urlencoded());
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
 
+app.get("/api/:date?", function (req, res) {
+  let strDate = req.params.date;
+  let date = null;
+  if(strDate){    
+    date = new Date(isNaN(strDate) ? strDate : parseInt(strDate));
+  } else{
+     date = new Date()
+  }  
 
-// your first API endpoint... 
-app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
+  if(date == 'Invalid Date') {
+    return res.json({
+      error: "Invalid Date"
+    });
+  }
+  
+  res.json({
+    unix: date.getTime(),
+    utc: date.toUTCString()
+  });
 });
 
 
